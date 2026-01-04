@@ -1,0 +1,109 @@
+:root {
+  --main-color: #3f8176;
+  --bg-color: #e9e9e9;
+  --white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Arbutus Slab", serif;
+  background: var(--bg-color);
+  color: #181818;
+  line-height: 1.6;
+}
+
+header, main {
+  max-width: 1000px;
+  margin: 0 auto; /*가운데 정렬*/
+  padding: 0 20px;  /*여백*/
+}
+
+header {
+  padding: 50px 0 45px;
+}
+
+section { margin: 48px 0; }
+#about { margin-top: 35px; }
+#skills { margin-top: 55px; }
+#projects { margin-top: 52px; margin-bottom: 58px; }
+#experience { margin-top: 50px; }
+
+h1 {
+  font-size: 3.3rem;
+  font-weight: 400;
+  color: #000;
+  letter-spacing: -1.3px;
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: 1.9rem;
+  font-weight: 400;
+  color: #000;
+  border-bottom: 2px solid #222; /*섹션 구분선*/
+  padding-bottom: 10px;
+  margin-bottom: 20px; /*밑줄과 글자 간격*/
+  display: inline-block; /*밑줄*/
+}
+
+h3 {
+  font-size: 1.25rem;
+  margin: 18px 0 10px;
+  color: var(--main-color);
+}
+
+#skills ul {
+  list-style: none;
+  padding: 0;
+  display: flex; /*가로배치*/
+  flex-wrap: wrap;
+  gap: 10px; /*간격*/
+}
+
+#skills li {
+  background: var(--white);
+  border: 1px solid #ddd;
+  padding: 7px 12px;
+  border-radius: 900px; /*동글동글하게*/
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /*2개씩 배치, 자동으로 크기 조절*/
+  gap: 22px; /*카드 사이 간격*/
+}
+
+.project-card {
+  background: var(--white);
+  border: 1px solid #ddd; /*카드 테두리*/
+  border-radius: 10px; /*모서리 둥글게*/
+  padding: 22px; /*카드 내부 여백*/
+}
+
+.project-card h3 {
+  margin: 0 0 8px; /*여백 없애기*/
+  font-size: 1.35rem;
+  color: var(--main-color);
+}
+
+.project-card p {
+  margin: 0; /*여백 없애기*/
+  color: #2d3330;
+  font-size: 1rem;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
