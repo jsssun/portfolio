@@ -1,105 +1,182 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio Jsssun</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jsssun's Portfolio</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Arbutus+Slab&display=swap" rel="stylesheet" />
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 
-  <link rel="stylesheet" href="style.css" />
+    <!-- Pixel Font -->
+    <link href="https://cdn.jsdelivr.net/gh/ungyeolee/DungGeunMo/DungGeunMo.css" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>Sunwoo Jung</h1>
-  </header>
 
-  <main>
-    <section id="about">
-      <h2>About Me</h2>
-      <p>빠른 학습과 성실함으로 가치를 만들어내는 개발자 정선우입니다.</p>
-      <p>Email: <a href="mailto:gmhie1208@gmail.com">gmhie1208@gmail.com</a></p>
-      <p>
-        Github:
-        <a href="https://github.com/jsssun" target="_blank" rel="noopener noreferrer">
-          https://github.com/jsssun
-        </a>
-      </p>
-    </section>
+    <!-- 배경 -->
+    <div class="cloud-bg"></div>
 
-    <section id="skills">
-      <h2>Skills</h2>
+    <main class="container">
 
-      <h3>Languages</h3>
-      <ul>
-        <li>Java</li>
-        <li>Python</li>
-        <li>C#</li>
-        <li>ABAP</li>
-      </ul>
+        <!-- PROFILE -->
+        <section id="profile" class="retro-window">
+            <div class="window-header">
+                <span class="window-title">PROFILE</span>
+                <div class="window-buttons">
+                    <span>_</span><span>□</span><span>X</span>
+                </div>
+            </div>
+            <div class="window-body profile-content">
+                <div class="avatar-frame">
+                    <!-- 프로필 이미지 -->
+                    <img src="icons/profile.jpg" alt="내 얼굴" class="avatar">
+                </div>
+                <div class="profile-text">
+                    <h1>정선우</h1>
+                    <p class="bio">"안녕하세요, 개발자 정선우입니다!"</p>
+                </div>
+            </div>
+        </section>
 
-      <h3>Frameworks & Engines</h3>
-      <ul>
-        <li>Spring Boot</li>
-        <li>Unity</li>
-      </ul>
+        <!-- CERTIFICATIONS -->
+        <section id="certs" class="retro-window">
+            <div class="window-header">
+                <span class="window-title">CERTIFICATIONS</span>
+                <div class="window-buttons"><span>_</span><span>□</span><span>X</span></div>
+            </div>
+            <div class="window-body">
+                <ul class="pixel-list">
+                    <li>정보처리기사</li>
+                    <li>SAP Certified Associate - Back-End Developer - ABAP Cloud</li>
+                    <li>OPIc IH</li>
+                </ul>
+            </div>
+        </section>
 
-      <h3>Database & Infra</h3>
-      <ul>
-        <li>MySQL</li>
-        <li>SAP Data Dictionary</li>
-        <li>AWS EC2</li>
-        <li>Postman</li>
-      </ul>
+        <!-- PROJECTS -->
+        <section id="projects" class="retro-window">
+            <div class="window-header">
+                <span class="window-title">PROJECTS</span>
+                <div class="window-buttons"><span>_</span><span>□</span><span>X</span></div>
+            </div>
 
-      <h3>Tools</h3>
-      <ul>
-        <li>Notion</li>
-        <li>Git</li>
-        <li>Figma</li>
-      </ul>
-    </section>
+            <div class="window-body grid-container">
 
-    <section id="certifications">
-      <h2>Certifications</h2>
-      <ul>
-        <li>정보처리기사</li>
-        <li>SAP Certified Associate - Back-End Developer - ABAP Cloud</li>
-        <li>OPIc IH</li>
-      </ul>
-    </section>
+                <a href="https://github.com/nnyouung/woorifisa-chatbot"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="project-card">
+                    <div class="card-img">
+                        <img src="icons/wibee-chatbot.png" alt="wibee-chatbot">
+                    </div>
+                    <div class="card-info">
+                        <h3>wibee-chatbot</h3>
+                        <p class="desc">CLOVA API를 활용한 우리FISA 수강생용 일정·학습 안내 챗봇</p>
+                    </div>
+                </a>
 
-    <section id="projects">
-      <h2>Projects</h2>
+                <a href="https://github.com/Picount-SOLUX"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="project-card">
+                    <div class="card-img">
+                        <img src="icons/picount.png" alt="Picount">
+                    </div>
+                    <div class="card-info">
+                        <h3>Picount</h3>
+                        <p class="desc">카테고리별로 자산을 나눠 관리하는 가계부 웹서비스</p>
+                    </div>
+                </a>
 
-      <div class="project-grid">
-        <article class="project-card">
-          <h3>Picount</h3>
-          <p>예산을 조각내어 관리하고 소비 기록 습관을 만드는 가계부 웹 서비스</p>
-        </article>
+                <a href="https://github.com/SUHHAN/HexaSnow"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="project-card">
+                    <div class="card-img">
+                        <img src="icons/recipe2.png" alt="단 하나의 레시피">
+                    </div>
+                    <div class="card-info">
+                        <h3>단 하나의 레시피</h3>
+                        <p class="desc">빵집 운영 베이킹 모바일 2D 게임</p>
+                    </div>
+                </a>
 
-        <article class="project-card">
-          <h3>단 하나의 레시피</h3>
-          <p>할머니의 제과점을 이어받아 운영하는 모바일 게임</p>
-        </article>
+                <a href="https://github.com/TUMS-Cafe/TravelAroundTheWorld"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="project-card">
+                    <div class="card-img">
+                        <img src="icons/taw.png" alt="Travel Around The World">
+                    </div>
+                    <div class="card-info">
+                        <h3>Travel Around The World</h3>
+                        <p class="desc">기차 안에서 카페를 운영하며 퀘스트를 해결하는 비주얼노벨 시뮬레이션 게임</p>
+                    </div>
+                </a>
 
-        <article class="project-card">
-          <h3>Travel Around The World</h3>
-          <p>열차에서 벌어지는 사건들을 해결해나가는 PC 게임</p>
-        </article>
-      </div>
-    </section>
+                <a href="https://github.com/SUHHAN/FIVEUS"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="project-card">
+                    <div class="card-img">
+                        <img src="icons/twk.png" alt="The Way to Be Knight">
+                    </div>
+                    <div class="card-info">
+                        <h3>The Way to Be Knight</h3>
+                        <p class="desc">수집형 RPG 어드벤쳐 게임</p>
+                    </div>
+                </a>
 
-    <section id="experience">
-      <h2>Experience & Activities</h2>
-      <ul>
-        <li>개발동아리 임원</li>
-        <li>알고리즘 학회 임원</li>
-        <li>게임 개발 동아리</li>
-      </ul>
-    </section>
-  </main>
+            </div>
+        </section>
+
+        <!-- ACTIVITIES -->
+        <section id="activities" class="retro-window">
+            <div class="window-header">
+                <span class="window-title">ACTIVITIES</span>
+                <div class="window-buttons"><span>_</span><span>□</span><span>X</span></div>
+            </div>
+            <div class="window-body">
+                <div class="activity-item">
+                    <h4>우리FISA 6기</h4>
+                    <p>클라우드 서비스 개발 수강 중</p>
+                    <p>2025.12.30 ~</p>
+                </div>
+                <div class="activity-item">
+                    <h4>개발 동아리 임원</h4>
+                    <p>2024.03 ~ 2026.02</p>
+                    <p>발표회 대상, 최우수상 수상</p>
+                </div>
+                <div class="activity-item">
+                    <h4>알고리즘 학회 임원</h4>
+                    <p>2024.03 ~ 2025.02</p>
+                </div>
+                <div class="activity-item">
+                    <h4>게임 개발 동아리</h4>
+                    <p>2023.09 ~ 2025.02</p>
+                    <p>UNIDEV 주관 UNICON 우수상</p>
+                    <p>서울경제진흥원 X 슈퍼빌런랩스 게임 콘테스트 우수상</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section id="contact" class="retro-window">
+            <div class="window-header">
+                <span class="window-title">CONNECT.EXE</span>
+                <div class="window-buttons"><span>_</span><span>□</span><span>X</span></div>
+            </div>
+            <div class="window-body contact-body">
+                <div class="contact-links">
+                    <a href="mailto:gmhie1208@gmail.com" class="btn">Email 보내기</a>
+                    <a href="https://github.com/jsssun" target="_blank" class="btn">Github 방문</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JS -->
+    <script src="app.js"></script>
 </body>
 </html>
