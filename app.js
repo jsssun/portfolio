@@ -422,7 +422,7 @@ const portfolioData = {
       stack: ["Unity", "C#"],
       links: {
         github: "https://github.com/SUHHAN/HexaSnow",
-        playstore: "https://play.google.com/store/apps/details?id=com.DefaultCompany.HexaSnow"
+        playstore: "https://play.google.com/store/apps/details?id=com.DefaultCompany.HexaSnow&pli=1"
       },
       detail: {
         overview:
