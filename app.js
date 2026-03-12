@@ -2,7 +2,7 @@ const portfolioData = {
   profile: {
     name: "정선우",
     role: "풀스택 개발자",
-    bio: "팀 프로젝트와 다양한 사이드 프로젝트를 통해 꾸준히 성장해온 개발자입니다. 언제든 피드백과 협업을 환영합니다!",
+    bio: "오픈소스 기여를 통해 라이브러리 내부 구조를 이해하고, 팀 프로젝트와 다양한 사이드 프로젝트를 통해 꾸준히 성장해온 개발자입니다. 언제든 피드백과 협업을 환영합니다!",
     avatar: "icons/profile2.jpg",
     email: "gmhie1208@gmail.com",
     github: "https://github.com/jsssun"
@@ -19,8 +19,9 @@ const portfolioData = {
 
   certs: [
     "정보처리기사",
-    "TOPCIT 3수준",
-    "SAP Certified Associate (ABAP Cloud)"
+    "SAP Certified Associate (ABAP Cloud)",
+    "TOPCIT 3수준 (503점)",
+    "OPIc IH"
   ],
 
   projects: [
@@ -32,7 +33,7 @@ const portfolioData = {
       img: "icons/card.png",
       stack: ["Java", "Servlet/JSP", "JDBC", "HikariCP", "Nginx", "Tomcat", "MySQL", "Docker", "Logback"],
       links: {
-        github: "https://github.com/light11014/woori-card-project"
+        github: "https://github.com/jsssun/card-trend-dashboard"
       },
       detail: {
         overview:
@@ -46,6 +47,7 @@ const portfolioData = {
           "사전 집계 테이블 활용으로 530만 건 데이터 조회 성능 최적화",
           "HikariCP 기반 Read/Write DataSource 분리 구성 (읽기 → Replica, 쓰기 → Source)",
           "Nginx Session Replication 적용으로 WAS 이중화 환경에서 세션 유지",
+          "Logback 기반 거래 로그·운영 로그 분리 및 롤링 아카이빙 적용",
           "분기별 소비 트렌드, 전분기 대비 증감률, Top 3 카테고리 시각화 기능 구현"
         ]
       }
@@ -59,7 +61,7 @@ const portfolioData = {
       img: "icons/keypad.png",
       stack: ["React", "TypeScript", "npm"],
       links: {
-        github: "https://github.com/woori-fisa-frontend/secure-keypad"
+        github: "https://github.com/jsssun/react-secure-keypad"
       },
       detail: {
         overview:
@@ -210,6 +212,27 @@ const portfolioData = {
       period: "2023.09 ~ 2025.02",
       desc: "UNICON 우수상, SBA 게임 공모전 우수상 수상"
     }
+  ],
+
+  awards: [
+    {
+      title: "기술세미나 우수상",
+      org: "우리FIS 아카데미",
+      date: "2026.03.05",
+      desc: "오픈소스 기여하기 주제로 기술세미나를 진행해 우수상을 수상하였습니다."
+    },
+    {
+      title: "2024 SBA X 슈퍼빌런랩스 게임 컨테스트 우수상",
+      org: "서울경제진흥원(SBA) & 슈퍼빌런랩스",
+      date: "2024.09.08",
+      desc: "전국 참가팀 중 창의성과 완성도를 인정받아 수상했으며, 기획 및 개발 능력과 팀 프로젝트를 통한 실무 문제 해결 능력을 인정받았습니다."
+    },
+    {
+      title: "UNICON 2024 우수상",
+      org: "UNIDEV",
+      date: "2024.08.24",
+      desc: "Travel Around The World를 UNICON 2024 게임 전시회에 출품하여 전국 19개 동아리, 50개 팀 중 4등을 수상했습니다."
+    }
   ]
 };
 
@@ -252,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderHome() {
-    const { profile, techStack, certs, projects, activities } = portfolioData;
+    const { profile, techStack, certs, projects, activities, awards } = portfolioData;
 
     app.innerHTML = `
       <header class="profile-section">
@@ -314,6 +337,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
               </div>
             </a>
+          `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="fade-in">
+        <h2 class="section-title">Awards</h2>
+        <div class="awards-list">
+          ${awards
+            .map(
+              (a) => `
+            <div class="award-item">
+              <div class="award-left">
+                <span class="award-trophy">🏆</span>
+              </div>
+              <div class="award-body">
+                <div class="award-header">
+                  <h4 class="award-title">${a.title}</h4>
+                  <span class="award-date">${a.date}</span>
+                </div>
+                <span class="award-org">${a.org}</span>
+                <p class="award-desc">${a.desc}</p>
+              </div>
+            </div>
           `
             )
             .join("")}
