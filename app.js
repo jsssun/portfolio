@@ -2,7 +2,7 @@ const portfolioData = {
   profile: {
     name: "정선우",
     role: "풀스택 개발자",
-    bio: "오픈소스 기여를 통해 라이브러리 내부 구조를 이해하고, 팀 프로젝트와 다양한 사이드 프로젝트를 통해 꾸준히 성장해온 개발자입니다. 언제든 피드백과 협업을 환영합니다!",
+    bio: "팀 프로젝트와 다양한 사이드 프로젝트를 통해 꾸준히 성장해온 개발자입니다. 언제든 피드백과 협업을 환영합니다!",
     avatar: "icons/profile2.jpg",
     email: "gmhie1208@gmail.com",
     github: "https://github.com/jsssun"
@@ -11,17 +11,16 @@ const portfolioData = {
   techStack: {
     "Language": ["Java", "Python", "C#", "JavaScript", "TypeScript"],
     "Database": ["MySQL"],
-    "Infra / DevOps": ["Nginx", "Apache Tomcat", "Docker"],
+    "Infra / DevOps": ["Nginx", "Apache Tomcat", "Docker", "WSL"],
     "Backend": ["Spring Boot", "Servlet/JSP", "JDBC", "HikariCP", "Lombok", "Logback", "JUnit"],
     "Frontend": ["React", "Next.js", "Tailwind CSS", "HTML"],
-    "협업 도구": ["Git", "Postman", "WSL", "Notion"]
+    "협업 도구": ["Git", "Postman", "Notion"]
   },
 
   certs: [
     "정보처리기사",
-    "SAP Certified Associate (ABAP Cloud)",
-    "TOPCIT 3수준 (503점)",
-    "OPIc IH"
+    "TOPCIT 3수준",
+    "SAP Certified Associate (ABAP Cloud)"
   ],
 
   projects: [
@@ -47,7 +46,6 @@ const portfolioData = {
           "사전 집계 테이블 활용으로 530만 건 데이터 조회 성능 최적화",
           "HikariCP 기반 Read/Write DataSource 분리 구성 (읽기 → Replica, 쓰기 → Source)",
           "Nginx Session Replication 적용으로 WAS 이중화 환경에서 세션 유지",
-          "Logback 기반 거래 로그·운영 로그 분리 및 롤링 아카이빙 적용",
           "분기별 소비 트렌드, 전분기 대비 증감률, Top 3 카테고리 시각화 기능 구현"
         ]
       }
