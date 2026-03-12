@@ -103,7 +103,7 @@ html[data-theme="light"] .ambient-bg {
   margin-bottom: 12px;
   letter-spacing: 0.03em;
   color: var(--text-primary);
-  font-family: "Do Hyeon", sans-serif;
+  font-family: "Pretendard Variable", system-ui, sans-serif;
   line-height: 1.2;
 }
 .bio { color: var(--text-secondary); max-width: 600px; margin-bottom: 24px; font-size: 1rem; }
@@ -190,6 +190,16 @@ section {
   color: var(--accent);
   background: var(--accent-glow);
   transform: translateY(-1px);
+}
+
+.techstack-badge-img {
+  height: 26px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+.techstack-badge-img:hover {
+  transform: translateY(-2px);
+  opacity: 0.85;
 }
 
 /* Certs */

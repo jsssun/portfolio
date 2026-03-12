@@ -83,14 +83,7 @@ const portfolioData = {
       role: "백엔드 개발",
       desc: "카테고리 기반 예산 관리 가계부 웹 서비스",
       img: "icons/picount.png",
-      stack: [
-        "Java",
-        "Spring Boot",
-        "Spring Data JPA",
-        "MySQL",
-        "H2 (Test DB)",
-        "REST API"
-      ],
+      stack: ["Java", "Spring Boot", "Spring Data JPA", "MySQL", "H2 (Test DB)", "REST API"],
       links: {
         github: "https://github.com/Picount-SOLUX"
       },
@@ -234,6 +227,51 @@ const portfolioData = {
   ]
 };
 
+// --- Badge Map & Tech Stack Renderer (전역 스코프) ---
+
+const BADGE_MAP = {
+  "Java":          "https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white",
+  "Python":        "https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white",
+  "JavaScript":    "https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black",
+  "TypeScript":    "https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white",
+  "C#":            "https://img.shields.io/badge/C%23-239120?style=flat&logo=csharp&logoColor=white",
+  "MySQL":         "https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white",
+  "Nginx":         "https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white",
+  "Apache Tomcat": "https://img.shields.io/badge/Tomcat-F8DC75?style=flat&logo=apachetomcat&logoColor=black",
+  "Docker":        "https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white",
+  "WSL":           "https://img.shields.io/badge/WSL-0078D4?style=flat&logo=windows&logoColor=white",
+  "Spring Boot":   "https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white",
+  "Servlet/JSP":   "https://img.shields.io/badge/Servlet%2FJSP-007396?style=flat&logo=openjdk&logoColor=white",
+  "JDBC":          "https://img.shields.io/badge/JDBC-007396?style=flat&logo=openjdk&logoColor=white",
+  "HikariCP":      "https://img.shields.io/badge/HikariCP-0096FF?style=flat&logoColor=white",
+  "Lombok":        "https://img.shields.io/badge/Lombok-CC0000?style=flat&logoColor=white",
+  "Logback":       "https://img.shields.io/badge/Logback-6DB33F?style=flat&logoColor=white",
+  "JUnit":         "https://img.shields.io/badge/JUnit5-25A162?style=flat&logo=junit5&logoColor=white",
+  "React":         "https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black",
+  "Next.js":       "https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white",
+  "Tailwind CSS":  "https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white",
+  "HTML":          "https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white",
+  "Git":           "https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white",
+  "Postman":       "https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white",
+  "Notion":        "https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white"
+};
+
+function renderTechStack(techStack) {
+  return Object.entries(techStack).map(([category, items]) => `
+    <div class="techstack-row">
+      <span class="techstack-category">${category}</span>
+      <div class="techstack-badges">
+        ${items.map(item => {
+          const url = BADGE_MAP[item];
+          return url
+            ? `<img src="${url}" alt="${item}" class="techstack-badge-img" />`
+            : `<span class="techstack-badge">${item}</span>`;
+        }).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
 // --- App Logic ---
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -259,17 +297,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       renderHome();
     }
-  }
-
-  function renderTechStack(techStack) {
-    return Object.entries(techStack).map(([category, items]) => `
-      <div class="techstack-row">
-        <span class="techstack-category">${category}</span>
-        <div class="techstack-badges">
-          ${items.map(item => `<span class="techstack-badge">${item}</span>`).join("")}
-        </div>
-      </div>
-    `).join("");
   }
 
   function renderHome() {
@@ -309,9 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <section class="fade-in">
         <h2 class="section-title">Featured Projects</h2>
         <div class="grid-container">
-          ${projects
-            .map(
-              (p) => `
+          ${projects.map((p) => `
             <a href="#project/${p.id}" class="project-card">
               <div class="card-img-wrapper">
                 <img src="${p.img}" alt="${p.title}" />
@@ -323,30 +348,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <p class="card-desc">${p.desc}</p>
                 <div class="tech-stack">
-                  ${p.stack
-                    .slice(0, 3)
-                    .map((t) => `<span class="tech-item">${t}</span>`)
-                    .join("")}
-                  ${
-                    p.stack.length > 3
-                      ? `<span class="tech-item">+${p.stack.length - 3}</span>`
-                      : ""
-                  }
+                  ${p.stack.slice(0, 3).map((t) => `<span class="tech-item">${t}</span>`).join("")}
+                  ${p.stack.length > 3 ? `<span class="tech-item">+${p.stack.length - 3}</span>` : ""}
                 </div>
               </div>
             </a>
-          `
-            )
-            .join("")}
+          `).join("")}
         </div>
       </section>
 
       <section class="fade-in">
         <h2 class="section-title">Awards</h2>
         <div class="awards-list">
-          ${awards
-            .map(
-              (a) => `
+          ${awards.map((a) => `
             <div class="award-item">
               <div class="award-left">
                 <span class="award-trophy">🏆</span>
@@ -360,18 +374,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 <p class="award-desc">${a.desc}</p>
               </div>
             </div>
-          `
-            )
-            .join("")}
+          `).join("")}
         </div>
       </section>
 
       <section class="fade-in">
         <h2 class="section-title">Experience & Activities</h2>
         <div class="activity-list">
-          ${activities
-            .map(
-              (a) => `
+          ${activities.map((a) => `
             <div class="activity-item">
               <div class="act-header">
                 <h4>${a.title}</h4>
@@ -379,9 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
               </div>
               <p class="act-desc">${a.desc}</p>
             </div>
-          `
-            )
-            .join("")}
+          `).join("")}
         </div>
       </section>
 
@@ -407,7 +415,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="detail-grid">
         <div class="detail-main">
           <img src="${p.img}" alt="${p.title}" class="detail-image" />
-          
+
           <div class="detail-desc">
             <h3>Overview</h3>
             <p>${p.detail.overview}</p>
@@ -430,19 +438,17 @@ document.addEventListener("DOMContentLoaded", () => {
               ${p.stack.map((t) => `<span class="tech-item">${t}</span>`).join("")}
             </div>
           </div>
-          
+
           <div class="sidebar-section">
             <span class="sidebar-label">Links</span>
             <a href="${p.links.github}" target="_blank" class="btn-pill" style="display:block; text-align:center; width:100%;">GitHub Repository</a>
-            ${
-              p.links.playstore
-                ? `<a href="${p.links.playstore}" target="_blank" class="btn-pill" style="display:block; text-align:center; width:100%; margin-top:10px;">Play Store</a>`
-                : ""
-            }
+            ${p.links.playstore
+              ? `<a href="${p.links.playstore}" target="_blank" class="btn-pill" style="display:block; text-align:center; width:100%; margin-top:10px;">Play Store</a>`
+              : ""}
           </div>
         </aside>
       </div>
-      
+
       <footer>
         &copy; 2026 ${portfolioData.profile.name}. All rights reserved.
       </footer>
