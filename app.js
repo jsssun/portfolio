@@ -18,6 +18,7 @@ const portfolioData = {
   },
 
   certs: [
+    "OPIc IH",
     "정보처리기사",
     "TOPCIT 3수준",
     "SAP Certified Associate (ABAP Cloud)"
