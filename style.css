@@ -261,7 +261,7 @@ html[data-theme="light"] .project-card:hover {
 .project-card:hover .card-img-wrapper img { transform: scale(1.05); }
 
 .card-content { padding: 20px; flex: 1; display: flex; flex-direction: column; }
-.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px; }
+.card-header { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 10px; gap: 10px; }
 .card-header h3 { font-size: 1.1rem; font-weight: 600; }
 
 .role-badge {
