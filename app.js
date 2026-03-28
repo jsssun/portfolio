@@ -110,7 +110,7 @@ const portfolioData = {
       id: "taw",
       title: "Travel Around The World",
       role: "클라이언트 게임 개발",
-      desc: "세계를 여행하는 열차에서 카페를 운영하는 스토리 시뮬레이션 게임 — UNICON 2024 우수상",
+      desc: "세계를 여행하는 열차에서 카페를 운영하는 스토리 시뮬레이션 게임",
       img: "icons/taw.png",
       stack: ["Unity", "C#"],
       links: {
@@ -136,7 +136,7 @@ const portfolioData = {
       id: "recipe",
       title: "단 하나의 레시피",
       role: "클라이언트 게임 개발",
-      desc: "할머니의 제과점을 운영하는 힐링 2D 베이킹 타이쿤 게임 — SBA 게임 컨테스트 우수상 · Google Play 출시",
+      desc: "할머니의 제과점을 운영하는 힐링 2D 베이킹 타이쿤 게임 — Google Play 출시",
       img: "icons/recipe2.png",
       stack: ["Unity", "C#"],
       links: {
