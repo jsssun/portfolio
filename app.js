@@ -32,16 +32,11 @@ const portfolioData = {
       desc: "POS → VAN → 카드사 전 구간을 MSA + Docker로 구현한 실시간 결제 승인 및 정산 파이프라인",
       img: "icons/payment.png",
       stack: ["Java", "Spring Boot", "Spring Batch", "Spring Data JPA", "MySQL", "Docker", "Eureka"],
-      links: {
-        github: "https://github.com/fisa-card-payment"
-      },
+      links: { github: "https://github.com/fisa-card-payment" },
       detail: {
-        overview:
-          "POS 단말기의 결제 요청이 VAN을 거쳐 카드사 내부 서비스까지 처리되는 전체 파이프라인을 MSA 아키텍처로 구현한 시뮬레이터입니다. VAN, API Gateway, Payment, Settlement, Banking 5개 서비스가 Eureka 기반으로 연동됩니다.",
-        problem:
-          "서비스 간 직접 의존 없이 실시간 결제 승인과 야간 정산 배치를 안정적으로 처리해야 했고, 정산 완료 시점을 클라이언트에 효율적으로 통보해야 했습니다.",
-        solution:
-          "Spring Batch chunk 처리로 대량 거래 데이터를 안정적으로 정산 CSV로 변환하고, SSE(Server-Sent Events)를 도입해 정산 완료 결과를 실시간으로 VAN에 Push하도록 설계했습니다.",
+        overview: "POS 단말기의 결제 요청이 VAN을 거쳐 카드사 내부 서비스까지 처리되는 전체 파이프라인을 MSA 아키텍처로 구현한 시뮬레이터입니다. VAN, API Gateway, Payment, Settlement, Banking 5개 서비스가 Eureka 기반으로 연동됩니다.",
+        problem: "서비스 간 직접 의존 없이 실시간 결제 승인과 야간 정산 배치를 안정적으로 처리해야 했고, 정산 완료 시점을 클라이언트에 효율적으로 통보해야 했습니다.",
+        solution: "Spring Batch chunk 처리로 대량 거래 데이터를 안정적으로 정산 CSV로 변환하고, SSE(Server-Sent Events)를 도입해 정산 완료 결과를 실시간으로 VAN에 Push하도록 설계했습니다.",
         contributions: [
           "VAN 서비스 전체 설계 및 구현 — BIN 조회 기반 카드사 식별, API Gateway 경유 결제 중계",
           "Spring Batch(Reader → Processor → Writer) 구조로 일일 승인 내역 CSV 생성 및 카드사 전송 자동화",
@@ -51,7 +46,6 @@ const portfolioData = {
         ]
       }
     },
-
     {
       id: "payroll",
       title: "Flex Payroll & Security System",
@@ -59,16 +53,11 @@ const portfolioData = {
       desc: "OAuth 2.0 인증 서버와 비즈니스 서버를 분리한 MSA 기반 급여 및 야근 관리 시스템",
       img: "icons/payroll.png",
       stack: ["Java", "Spring Boot", "Next.js", "TypeScript", "Tailwind CSS", "MySQL", "Docker"],
-      links: {
-        github: "https://github.com/pauly00/oauth-security"
-      },
+      links: { github: "https://github.com/pauly00/oauth-security" },
       detail: {
-        overview:
-          "Spring Authorization Server 기반의 OAuth 2.0 인증 서버와 Resource Server를 완전히 분리한 MSA 급여 관리 시스템입니다. 다단계 야근 승인 워크플로우, 급여 자동 계산, OAuth 개발자 콘솔을 포함합니다.",
-        problem:
-          "인증과 비즈니스 로직이 하나의 서버에 결합되어 있으면 보안 정책 변경 시 전체 서비스에 영향을 미치는 문제와, OAuth 클라이언트 시크릿의 안전한 발급·보관 방법이 과제였습니다.",
-        solution:
-          "인증 서버(9000)와 Resource Server(8080)를 물리적으로 분리하고, RSA 2048 비대칭키 기반 JWT로 서버 간 신뢰를 구성했습니다. client_secret은 BCrypt 암호화 저장 후 최초 발급 시에만 원본을 노출하는 단일 노출 패턴을 적용했습니다.",
+        overview: "Spring Authorization Server 기반의 OAuth 2.0 인증 서버와 Resource Server를 완전히 분리한 MSA 급여 관리 시스템입니다. 다단계 야근 승인 워크플로우, 급여 자동 계산, OAuth 개발자 콘솔을 포함합니다.",
+        problem: "인증과 비즈니스 로직이 하나의 서버에 결합되어 있으면 보안 정책 변경 시 전체 서비스에 영향을 미치는 문제와, OAuth 클라이언트 시크릿의 안전한 발급·보관 방법이 과제였습니다.",
+        solution: "인증 서버(9000)와 Resource Server(8080)를 물리적으로 분리하고, RSA 2048 비대칭키 기반 JWT로 서버 간 신뢰를 구성했습니다. client_secret은 BCrypt 암호화 저장 후 최초 발급 시에만 원본을 노출하는 단일 노출 패턴을 적용했습니다.",
         contributions: [
           "OAuth 개발자 콘솔 프론트엔드(Next.js 15 App Router) 전체 구현 — 클라이언트 등록·조회·삭제 UI",
           "client_secret 단일 노출 보안 패턴 구현 — 최초 발급 시에만 원본 표시, 이후 마스킹 처리",
@@ -78,7 +67,6 @@ const portfolioData = {
         ]
       }
     },
-
     {
       id: "cardtrend",
       title: "고가용성 데이터 대시보드",
@@ -86,16 +74,11 @@ const portfolioData = {
       desc: "Nginx 이중화 + MySQL Replication 구조 위에서 530만 건 데이터를 실시간 집계·시각화하는 3-Tier 대시보드",
       img: "icons/card.png",
       stack: ["Java", "Servlet/JSP", "JDBC", "HikariCP", "Nginx", "Tomcat", "MySQL", "Docker", "Logback"],
-      links: {
-        github: "https://github.com/jsssun/card-trend-dashboard"
-      },
+      links: { github: "https://github.com/jsssun/card-trend-dashboard" },
       detail: {
-        overview:
-          "약 530만 건의 거래 원천 데이터를 분기 단위로 사전 집계하여 카테고리별 금액·비율·증감률을 빠르게 조회할 수 있는 3-Tier 구조의 대시보드입니다. Nginx 로드밸런서 → Tomcat WAS 이중화 → MySQL Source/Replica 구조로 고가용성을 확보했습니다.",
-        problem:
-          "530만 건 원천 데이터를 매번 직접 조회할 경우 응답 속도가 지나치게 느려지는 문제와, WAS 이중화 환경에서 세션이 유지되지 않는 문제가 있었습니다.",
-        solution:
-          "사전 집계 테이블(TREND_QUARTERLY)을 도입해 쿼리 성능을 대폭 개선하고, Nginx Session Replication과 HikariCP 기반 Read/Write 분리 DataSource를 적용해 가용성과 성능을 함께 확보했습니다.",
+        overview: "약 530만 건의 거래 원천 데이터를 분기 단위로 사전 집계하여 카테고리별 금액·비율·증감률을 빠르게 조회할 수 있는 3-Tier 구조의 대시보드입니다. Nginx 로드밸런서 → Tomcat WAS 이중화 → MySQL Source/Replica 구조로 고가용성을 확보했습니다.",
+        problem: "530만 건 원천 데이터를 매번 직접 조회할 경우 응답 속도가 지나치게 느려지는 문제와, WAS 이중화 환경에서 세션이 유지되지 않는 문제가 있었습니다.",
+        solution: "사전 집계 테이블(TREND_QUARTERLY)을 도입해 쿼리 성능을 대폭 개선하고, Nginx Session Replication과 HikariCP 기반 Read/Write 분리 DataSource를 적용해 가용성과 성능을 함께 확보했습니다.",
         contributions: [
           "Nginx(로드밸런서) → Apache Tomcat 2대(이중화) → MySQL Source/Replica 전체 인프라 설계 및 구현",
           "사전 집계 테이블 도입으로 530만 건 데이터 조회 성능 최적화",
@@ -105,7 +88,6 @@ const portfolioData = {
         ]
       }
     },
-
     {
       id: "taw",
       title: "Travel Around The World",
@@ -113,16 +95,11 @@ const portfolioData = {
       desc: "세계를 여행하는 열차에서 카페를 운영하는 스토리 시뮬레이션 게임",
       img: "icons/taw.png",
       stack: ["Unity", "C#"],
-      links: {
-        github: "https://github.com/TUMS-Cafe/TravelAroundTheWorld"
-      },
+      links: { github: "https://github.com/TUMS-Cafe/TravelAroundTheWorld" },
       detail: {
-        overview:
-          "세계를 여행하는 열차 '루나 익스프레스'를 배경으로, 낮에는 카페를 운영하고 밤에는 열차를 탐험하며 승객들의 이야기를 풀어가는 스토리 중심 어드벤처 게임입니다. UNICON 2024 전국 게임 전시회에서 50개 팀 중 우수상을 수상했습니다.",
-        problem:
-          "스토리 진행과 시뮬레이션 플레이를 자연스럽게 결합하고, 반복적인 일과 속에서도 선택이 의미 있게 작용하도록 만드는 것이 어려웠습니다.",
-        solution:
-          "낮/밤 진행 시스템과 카페 운영을 스토리 이벤트와 연결하고, 선택과 행동에 따라 분기되는 대사 및 엔딩 구조를 구현했습니다.",
+        overview: "세계를 여행하는 열차 '루나 익스프레스'를 배경으로, 낮에는 카페를 운영하고 밤에는 열차를 탐험하며 승객들의 이야기를 풀어가는 스토리 중심 어드벤처 게임입니다. UNICON 2024 전국 게임 전시회에서 50개 팀 중 우수상을 수상했습니다.",
+        problem: "스토리 진행과 시뮬레이션 플레이를 자연스럽게 결합하고, 반복적인 일과 속에서도 선택이 의미 있게 작용하도록 만드는 것이 어려웠습니다.",
+        solution: "낮/밤 진행 시스템과 카페 운영을 스토리 이벤트와 연결하고, 선택과 행동에 따라 분기되는 대사 및 엔딩 구조를 구현했습니다.",
         contributions: [
           "챕터 1 전체 게임 흐름(스토리, 카페 운영, 탐험, 엔딩 분기) 구현",
           "CSV 기반 대사 및 이벤트 관리 시스템 개발 — 기획 변경에 유연하게 대응",
@@ -131,7 +108,6 @@ const portfolioData = {
         ]
       }
     },
-
     {
       id: "recipe",
       title: "단 하나의 레시피",
@@ -144,12 +120,9 @@ const portfolioData = {
         playstore: "https://play.google.com/store/apps/details?id=com.DefaultCompany.HexaSnow&pli=1"
       },
       detail: {
-        overview:
-          "할머니로부터 물려받은 제과점을 10일간 운영하며 베이킹과 손님 응대를 통해 따뜻한 이야기를 경험하는 힐링 스토리 중심의 2D 베이킹 게임입니다. 동아리 발표회 대상 수상 후 리팩토링을 거쳐 Google Play Store에 출시했습니다.",
-        problem:
-          "반복적인 플레이로 인한 피로감을 줄이면서도, 베이킹 과정 자체는 재미있고 의미 있게 만드는 것이 과제였습니다.",
-        solution:
-          "반죽·오븐·재료 상점 등 다양한 베이킹 미니게임과 레시피·재료·토핑 시스템을 도입하고, 손님별 시나리오와 결과 분기를 추가해 플레이에 변화를 주었습니다.",
+        overview: "할머니로부터 물려받은 제과점을 10일간 운영하며 베이킹과 손님 응대를 통해 따뜻한 이야기를 경험하는 힐링 스토리 중심의 2D 베이킹 게임입니다. 동아리 발표회 대상 수상 후 리팩토링을 거쳐 Google Play Store에 출시했습니다.",
+        problem: "반복적인 플레이로 인한 피로감을 줄이면서도, 베이킹 과정 자체는 재미있고 의미 있게 만드는 것이 과제였습니다.",
+        solution: "반죽·오븐·재료 상점 등 다양한 베이킹 미니게임과 레시피·재료·토핑 시스템을 도입하고, 손님별 시나리오와 결과 분기를 추가해 플레이에 변화를 주었습니다.",
         contributions: [
           "Unity와 C#을 활용한 클라이언트 전반 개발 담당",
           "베이킹 전체 플레이 흐름(재료 선택 → 반죽 → 오븐 → 토핑) 설계 및 구현",
@@ -161,51 +134,20 @@ const portfolioData = {
   ],
 
   activities: [
-    {
-      title: "우리FISA 6기",
-      period: "2025.12 ~ 현재",
-      desc: "클라우드 서비스 개발 과정 (React, Next.js, TypeScript, Java, Spring Boot)"
-    },
-    {
-      title: "개발 동아리",
-      period: "2024.03 ~ 2026.02",
-      desc: "기술 세미나 6회 운영, 부원·프로젝트팀 관리, 타 학회 협업 해커톤 추진. 프로젝트 발표회 대상·최우수상 수상"
-    },
-    {
-      title: "알고리즘 학회",
-      period: "2024.03 ~ 2025.02",
-      desc: "매주 알고리즘 스터디 진행 및 과제 채점·피드백 제공"
-    },
-    {
-      title: "게임 개발 동아리",
-      period: "2023.09 ~ 2025.02",
-      desc: "UNICON 우수상, SBA 게임 공모전 우수상 수상"
-    }
+    { title: "우리FISA 6기", period: "2025.12 ~ 현재", desc: "클라우드 서비스 개발 과정 (React, Next.js, TypeScript, Java, Spring Boot)" },
+    { title: "개발 동아리", period: "2024.03 ~ 2026.02", desc: "기술 세미나 6회 운영, 부원·프로젝트팀 관리, 타 학회 협업 해커톤 추진. 프로젝트 발표회 대상·최우수상 수상" },
+    { title: "알고리즘 학회", period: "2024.03 ~ 2025.02", desc: "매주 알고리즘 스터디 진행 및 과제 채점·피드백 제공" },
+    { title: "게임 개발 동아리", period: "2023.09 ~ 2025.02", desc: "UNICON 우수상, SBA 게임 공모전 우수상 수상" }
   ],
 
   awards: [
-    {
-      title: "기술세미나 우수상",
-      org: "우리FIS 아카데미",
-      date: "2026.03.05",
-      desc: "오픈소스 기여하기 주제로 기술세미나를 진행해 우수상을 수상하였습니다."
-    },
-    {
-      title: "2024 SBA X 슈퍼빌런랩스 게임 컨테스트 우수상",
-      org: "서울경제진흥원(SBA) & 슈퍼빌런랩스",
-      date: "2024.09.08",
-      desc: "전국 참가팀 중 창의성과 완성도를 인정받아 수상했으며, 기획 및 개발 능력과 팀 프로젝트를 통한 실무 문제 해결 능력을 인정받았습니다."
-    },
-    {
-      title: "UNICON 2024 우수상",
-      org: "UNIDEV",
-      date: "2024.08.24",
-      desc: "Travel Around The World를 UNICON 2024 게임 전시회에 출품하여 전국 19개 동아리, 50개 팀 중 4등을 수상했습니다."
-    }
+    { title: "기술세미나 우수상", org: "우리FIS 아카데미", date: "2026.03.05", desc: "오픈소스 기여하기 주제로 기술세미나를 진행해 우수상을 수상하였습니다." },
+    { title: "2024 SBA X 슈퍼빌런랩스 게임 컨테스트 우수상", org: "서울경제진흥원(SBA) & 슈퍼빌런랩스", date: "2024.09.08", desc: "전국 참가팀 중 창의성과 완성도를 인정받아 수상했으며, 기획 및 개발 능력과 팀 프로젝트를 통한 실무 문제 해결 능력을 인정받았습니다." },
+    { title: "UNICON 2024 우수상", org: "UNIDEV", date: "2024.08.24", desc: "Travel Around The World를 UNICON 2024 게임 전시회에 출품하여 전국 19개 동아리, 50개 팀 중 4등을 수상했습니다." }
   ]
 };
 
-// --- Badge Map & Tech Stack Renderer (전역 스코프) ---
+// --- Badge Map & Tech Stack Renderer ---
 
 const BADGE_MAP = {
   "Java":          "https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white",
@@ -375,10 +317,36 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </section>
 
+      <!-- 채팅 섹션: 서버 연결 확인 후 표시 -->
+      <section class="fade-in chat-section" style="display:none;">
+        <h2 class="section-title">선우에게 물어보기</h2>
+        <p class="chat-desc">프로젝트, 기술스택, 경험 등 무엇이든 질문해보세요.</p>
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-bubble bot">
+              안녕하세요. 선우의 포트폴리오에 오셨군요.<br/>
+              궁금하신 점이 있으시면 편하게 물어봐 주세요.
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <input
+              type="text"
+              id="chatInput"
+              class="chat-input"
+              placeholder="어떤 프로젝트를 해봤나요?"
+            />
+            <button id="chatSendBtn" class="chat-send-btn" aria-label="전송">→</button>
+          </div>
+        </div>
+      </section>
+
       <footer>
         &copy; 2026 ${profile.name}. All rights reserved.
       </footer>
     `;
+
+    // app.innerHTML 세팅 완료 후 채팅 초기화
+    initChat();
   }
 
   function renderDetail(p) {
@@ -441,6 +409,92 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       window.location.hash = "";
     };
+  }
+
+  function initChat() {
+    const section = document.querySelector(".chat-section");
+    const input = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("chatSendBtn");
+    const messages = document.getElementById("chatMessages");
+
+    if (!section || !input || !sendBtn || !messages) return;
+
+    const RAG_URL = "http://localhost:8080";
+
+    // 서버 연결 확인 — 연결되면 섹션 표시, 아니면 숨김 유지
+    fetch(`${RAG_URL}/api/rag/health`, {
+      signal: AbortSignal.timeout(2000)
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("서버 응답 오류");
+        section.style.display = "block";
+      })
+      .catch(() => {
+        section.style.display = "none";
+      });
+
+    // 메시지 버블 추가
+    function addMessage(text, isUser) {
+      const bubble = document.createElement("div");
+      bubble.className = `chat-bubble ${isUser ? "user" : "bot"}`;
+      bubble.innerHTML = text.replace(/\n/g, "<br/>");
+      messages.appendChild(bubble);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    // 로딩 말풍선 (점 애니메이션)
+    function addLoading() {
+      const bubble = document.createElement("div");
+      bubble.className = "chat-bubble bot loading";
+      bubble.id = "loadingBubble";
+      bubble.innerHTML = `<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>`;
+      messages.appendChild(bubble);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function removeLoading() {
+      const loading = document.getElementById("loadingBubble");
+      if (loading) loading.remove();
+    }
+
+    // API 호출
+    async function sendMessage() {
+      const query = input.value.trim();
+      if (!query) return;
+
+      input.value = "";
+      sendBtn.disabled = true;
+      addMessage(query, true);
+      addLoading();
+
+      try {
+        const res = await fetch(`${RAG_URL}/api/rag/query`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, maxResults: 3 }),
+        });
+
+        const json = await res.json();
+        removeLoading();
+
+        if (json.success) {
+          addMessage(json.data.answer, false);
+        } else {
+          addMessage("답변을 가져오지 못했습니다. 다시 시도해주세요.", false);
+        }
+      } catch (e) {
+        removeLoading();
+        addMessage("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.", false);
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
   }
 
   function initTheme() {
