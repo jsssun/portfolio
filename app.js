@@ -243,6 +243,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <hr class="divider" />
 
+      <!-- 채팅 섹션: 서버 연결 확인 후 표시 -->
+      <section class="fade-in chat-section" style="display:none;">
+        <h2 class="section-title">선우에게 물어보기</h2>
+        <p class="chat-desc">프로젝트, 기술스택, 경험 등 무엇이든 질문해보세요.</p>
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-bubble bot">
+              안녕하세요. 선우의 포트폴리오에 오셨군요.<br/>
+              궁금하신 점이 있으시면 편하게 물어봐 주세요.
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <input
+              type="text"
+              id="chatInput"
+              class="chat-input"
+              placeholder="어떤 프로젝트를 해봤나요?"
+            />
+            <button id="chatSendBtn" class="chat-send-btn" aria-label="전송">→</button>
+          </div>
+        </div>
+      </section>
+
       <section class="fade-in">
         <h2 class="section-title">Tech Stack</h2>
         <div class="techstack-table">
@@ -314,29 +337,6 @@ document.addEventListener("DOMContentLoaded", () => {
               <p class="act-desc">${a.desc}</p>
             </div>
           `).join("")}
-        </div>
-      </section>
-
-      <!-- 채팅 섹션: 서버 연결 확인 후 표시 -->
-      <section class="fade-in chat-section" style="display:none;">
-        <h2 class="section-title">선우에게 물어보기</h2>
-        <p class="chat-desc">프로젝트, 기술스택, 경험 등 무엇이든 질문해보세요.</p>
-        <div class="chat-container">
-          <div class="chat-messages" id="chatMessages">
-            <div class="chat-bubble bot">
-              안녕하세요. 선우의 포트폴리오에 오셨군요.<br/>
-              궁금하신 점이 있으시면 편하게 물어봐 주세요.
-            </div>
-          </div>
-          <div class="chat-input-row">
-            <input
-              type="text"
-              id="chatInput"
-              class="chat-input"
-              placeholder="어떤 프로젝트를 해봤나요?"
-            />
-            <button id="chatSendBtn" class="chat-send-btn" aria-label="전송">→</button>
-          </div>
         </div>
       </section>
 
