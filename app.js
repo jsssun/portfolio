@@ -27,9 +27,9 @@ const portfolioData = {
   projects: [
     {
       id: "payment",
-      title: "분산 결제 파이프라인 시뮬레이터",
+      title: "MSA 프로젝트",
       role: "VAN 개발 · MSA 설계",
-      desc: "POS → VAN → 카드사 전 구간을 MSA + Docker로 구현한 실시간 결제 승인 및 정산 파이프라인",
+      desc: "POS → VAN → 카드사 → 은행 전 구간을 MSA + Docker로 구현한 실시간 결제 승인 및 정산 프로젝트",
       img: "icons/payment.png",
       stack: ["Java", "Spring Boot", "Spring Batch", "Spring Data JPA", "MySQL", "Docker", "Eureka"],
       links: { github: "https://github.com/fisa-card-payment" },
@@ -70,7 +70,7 @@ const portfolioData = {
     },
     {
       id: "cardtrend",
-      title: "고가용성 데이터 대시보드",
+      title: "고객 카드 결제 트랜드 대시보드",
       role: "풀스택 개발 / 인프라 설계",
       desc: "Nginx 이중화 + MySQL Replication 구조 위에서 530만 건 데이터를 실시간 집계·시각화하는 3-Tier 대시보드",
       img: "icons/card.png",
