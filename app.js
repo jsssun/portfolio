@@ -47,23 +47,24 @@ const portfolioData = {
       }
     },
     {
-      id: "payroll",
-      title: "Flex Payroll & Security System",
-      role: "OAuth 콘솔 프론트엔드 개발",
-      desc: "OAuth 2.0 인증 서버와 비즈니스 서버를 분리한 MSA 기반 급여 및 야근 관리 시스템",
-      img: "icons/payroll.png",
-      stack: ["Java", "Spring Boot", "Next.js", "TypeScript", "Tailwind CSS", "MySQL", "Docker"],
-      links: { github: "https://github.com/pauly00/oauth-security" },
+      id: "picount",
+      title: "PICOUNT (가계부 웹 서비스)",
+      role: "백엔드 개발",
+      desc: "소비 데이터를 기반으로 예산을 카테고리별로 관리하고 월별 소비 패턴을 시각화하는 가계부 웹 서비스",
+      img: "icons/picount.png",
+      stack: ["Java", "Spring Boot", "MySQL", "AWS EC2", "Gradle"],
+      links: { github: "https://github.com/Picount-SOLUX" },
       detail: {
-        overview: "Spring Authorization Server 기반의 OAuth 2.0 인증 서버와 Resource Server를 완전히 분리한 MSA 급여 관리 시스템입니다. 다단계 야근 승인 워크플로우, 급여 자동 계산, OAuth 개발자 콘솔을 포함합니다.",
-        problem: "인증과 비즈니스 로직이 하나의 서버에 결합되어 있으면 보안 정책 변경 시 전체 서비스에 영향을 미치는 문제와, OAuth 클라이언트 시크릿의 안전한 발급·보관 방법이 과제였습니다.",
-        solution: "인증 서버(9000)와 Resource Server(8080)를 물리적으로 분리하고, RSA 2048 비대칭키 기반 JWT로 서버 간 신뢰를 구성했습니다. client_secret은 BCrypt 암호화 저장 후 최초 발급 시에만 원본을 노출하는 단일 노출 패턴을 적용했습니다.",
+        overview: "사용자의 소비 데이터를 카테고리 단위로 관리하고, 월별 소비 통계 및 감정 기반 소비 패턴을 분석할 수 있는 가계부 서비스입니다. 데이터 집계 및 시각화를 통해 사용자에게 직관적인 소비 인사이트를 제공합니다.",
+        problem: "소비 데이터를 단순 기록하는 수준을 넘어, 월별 통계와 변화 추이를 효율적으로 계산해야 했으며, 인증 및 프론트-백엔드 분리 환경에서 발생하는 보안 및 통신 이슈를 해결해야 했습니다.",
+        solution: "카테고리 기반 데이터 모델을 설계하고, 월말 리포트 기능에서 집계 로직을 구현하여 소비 통계 및 변화량을 계산했습니다. 또한 Spring Security 설정을 통해 JWT 인증 흐름을 개선하고 CORS 문제를 해결하여 안정적인 API 통신 환경을 구축했습니다.",
         contributions: [
-          "OAuth 개발자 콘솔 프론트엔드(Next.js 15 App Router) 전체 구현 — 클라이언트 등록·조회·삭제 UI",
-          "client_secret 단일 노출 보안 패턴 구현 — 최초 발급 시에만 원본 표시, 이후 마스킹 처리",
-          "OAuth 2.0 Authorization Code Flow 동의 화면(ConsentPage) 구현",
-          "RBAC(USER / ADMIN / SUPER_ADMIN) 기반 메뉴 자동 구성 및 접근 제어",
-          "RSA 2048 JWT, HttpOnly 쿠키 세션, CORS 정책 등 보안 아키텍처 설계 참여"
+          "수입·지출 등록/수정/삭제 API 구현 및 카테고리 기반 DB 설계",
+          "친구 추가 및 방명록 기능 개발을 통한 사용자 간 상호작용 기능 구현",
+          "캘린더 기반 소비 기록 및 이미지 저장 기능 API 개발",
+          "월말 소비 리포트 기능 구현 — 카테고리별 통계 및 소비 추이 계산",
+          "JWT 인증 실패 응답 처리 로직 개선 및 예외 처리 일관성 확보",
+          "Spring Security 기반 CORS 설정을 통한 프론트-백엔드 통신 문제 해결"
         ]
       }
     },
