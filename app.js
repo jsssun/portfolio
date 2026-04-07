@@ -3,7 +3,7 @@ const portfolioData = {
     name: "정선우",
     role: "백엔드 개발자",
     bio: "다양한 프로젝트와 동아리 활동을 통해 책임감 있게 끝까지 완주하는 태도와 협업 능력을 키웠습니다. 끊임없이 배우고 성장하는 개발자가 되기 위해 노력하고 있습니다.",
-    avatar: "icons/profile3.png",
+    avatar: "icons/profile5.png",
     email: "gmhie1208@gmail.com",
     github: "https://github.com/jsssun"
   },
