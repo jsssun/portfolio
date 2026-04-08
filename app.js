@@ -420,7 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!section || !input || !sendBtn || !messages) return;
 
-    const RAG_URL = "http://localhost:8080";
+    const RAG_URL = "http://43.203.120.16";
 
     // 서버 연결 확인 — 연결되면 섹션 표시, 아니면 숨김 유지
     fetch(`${RAG_URL}/api/rag/health`, {
