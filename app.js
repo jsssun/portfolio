@@ -420,7 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!section || !input || !sendBtn || !messages) return;
 
-    const RAG_URL = "https://43.203.120.16.nip.io";
+    const RAG_URL = "https://43.202.50.223.nip.io";
 
     // 서버 연결 확인 — 연결되면 섹션 표시, 아니면 숨김 유지
     fetch(`${RAG_URL}/api/rag/health`, {
