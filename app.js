@@ -27,8 +27,8 @@ const portfolioData = {
   projects: [
     {
       id: "payment",
-      title: "MSA 프로젝트",
-      role: "VAN 개발 · MSA 설계",
+      title: "MSA 카드 결제 시뮬레이터",
+      role: "VAN 서비스 개발 · MSA 설계",
       desc: "POS → VAN → 카드사 → 은행 전 구간을 MSA + Docker로 구현한 실시간 결제 승인 및 정산 프로젝트",
       img: "icons/payment.png",
       stack: ["Java", "Spring Boot", "Spring Batch", "Spring Data JPA", "MySQL", "Docker", "Eureka"],
@@ -41,8 +41,280 @@ const portfolioData = {
           "VAN 서비스 전체 설계 및 구현 — BIN 조회 기반 카드사 식별, API Gateway 경유 결제 중계",
           "Spring Batch(Reader → Processor → Writer) 구조로 일일 승인 내역 CSV 생성 및 카드사 전송 자동화",
           "SSE 기반 정산 결과 실시간 수신 구현 — Polling 대비 불필요한 요청 제거",
+          "Spring Cloud Gateway MVC 구성 — 라우팅 규칙 설정 및 UUID 기반 TraceId 헤더 자동 생성으로 MSA 요청 추적",
+          "Eureka Server 구성 — 5개 마이크로서비스(Gateway/VAN/Payment/Settlement/Banking) 등록 및 상태 모니터링",
           "Eureka + Docker Compose 기반 5개 마이크로서비스 네트워크 구성",
           "ISO 8583 표준 참고한 RRN/STAN/응답코드 설계, DDC 방식 정산 구조 적용"
+        ],
+        codeSnippets: [
+          {
+            title: "결제 승인 처리 — VanService.java",
+            code: `@Transactional
+public PaymentResponseDto processPayment(PaymentRequestDto request) {
+    // 1. BIN 조회: 카드번호 앞 6자리로 카드사 식별
+    //    실제 VAN 시스템과 동일한 방식 (ISO 8583 표준 참고)
+    String binPrefix = request.getCardNumber().replaceAll("-", "").substring(0, 6);
+    CardBin cardBin = cardBinRepository.findByBinPrefix(binPrefix).orElse(null);
+    String cardCompany = cardBin != null ? cardBin.getCompanyName() : "UNKNOWN";
+
+    // 2. API Gateway 경유로 카드사 승인 요청
+    //    카드사 내부 서비스에 직접 접근하지 않고 Gateway를 통해 라우팅
+    String cardCompanyEndpoint = "http://api-gateway:8080/api/payment/approve";
+    log.info("[VAN] 결제 요청 - 가맹점: {}, 금액: {}", request.getMerchantId(), request.getAmount());
+
+    PaymentResponseDto cardResponse = null;
+    try {
+        cardResponse = restTemplate.postForObject(
+                cardCompanyEndpoint, request, PaymentResponseDto.class);
+    } catch (Exception e) {
+        log.error("[VAN] 카드사 요청 실패: {}", e.getMessage());
+    }
+
+    // 3. RRN(거래 고유번호)은 카드사가 생성해서 응답으로 전달
+    //    실패 시 임시 에러 RRN 생성 (서비스 중단 없이 계속 동작)
+    String rrn = (cardResponse != null && cardResponse.getRrn() != null)
+            ? cardResponse.getRrn()
+            : "ERR" + System.currentTimeMillis() % 100000;
+
+    // 4. 응답코드 00 = 승인, 그 외 = 거절
+    String status = (cardResponse != null && "00".equals(cardResponse.getResponseCode()))
+            ? "APPROVED" : "REJECTED";
+    String approvalCode = cardResponse != null ? cardResponse.getApprovalCode() : null;
+    String responseCode = cardResponse != null ? cardResponse.getResponseCode() : "99";
+
+    // 5. 거래 결과 DB 저장
+    VanTransaction tx = VanTransaction.builder()
+            .rrn(rrn)
+            .stan(request.getStan())
+            .cardNumber(request.getCardNumber())
+            .amount(request.getAmount())
+            .merchantId(request.getMerchantId())
+            .cardCompany(cardCompany)
+            .responseCode(responseCode)
+            .approvalCode(approvalCode)
+            .status(status)
+            .build();
+    vanTransactionRepository.save(tx);
+    log.info("[VAN] 거래 저장 완료 - RRN: {}, STATUS: {}", rrn, status);
+
+    return PaymentResponseDto.builder()
+            .rrn(rrn)
+            .approvalCode(approvalCode)
+            .responseCode(responseCode)
+            .status(status)
+            .message(status.equals("APPROVED") ? "승인 완료" : "승인 거절")
+            .build();
+}`
+          },
+          {
+            title: "Spring Batch 설정 — AcquisitionJobConfig.java",
+            code: `@Slf4j
+@Configuration
+@EnableScheduling
+@RequiredArgsConstructor
+public class AcquisitionJobConfig {
+
+    private final JobRepository jobRepository;
+    private final PlatformTransactionManager transactionManager;
+    private final AcquisitionItemReader reader;
+    private final AcquisitionItemProcessor processor;
+    private final AcquisitionItemWriter writer;
+    private final JobLauncher jobLauncher;
+
+    @Bean
+    public Job acquisitionJob() {
+        return new JobBuilder("acquisitionJob", jobRepository)
+                .start(acquisitionStep())
+                .build();
+    }
+
+    @Bean
+    public Step acquisitionStep() {
+        // chunk(100): 100건씩 묶어서 처리
+        // → 메모리 효율적이고 중간 실패 시 해당 chunk부터 재시작 가능
+        return new StepBuilder("acquisitionStep", jobRepository)
+                .<VanTransaction, String>chunk(100, transactionManager)
+                .reader(reader)       // DB에서 당일 APPROVED 거래 조회
+                .processor(processor) // 카드번호 마스킹 + CSV 한 줄 변환
+                .writer(writer)       // CSV 파일 생성 + 카드사 전송
+                .build();
+    }
+
+    // 매일 자정 자동 실행
+    // JobParameters에 time 추가: 같은 Job을 날마다 실행하기 위해 고유 파라미터 필요
+    @Scheduled(cron = "0 0 0 * * *")
+    public void runBatch() throws Exception {
+        log.info("[BATCH] 매입 배치 시작");
+        reader.reset();
+        JobParameters params = new JobParametersBuilder()
+                .addLong("time", System.currentTimeMillis())
+                .toJobParameters();
+        jobLauncher.run(acquisitionJob(), params);
+    }
+}`
+          },
+          {
+            title: "CSV 변환 (카드번호 마스킹) — AcquisitionItemProcessor.java",
+            code: `@Slf4j
+@Component
+public class AcquisitionItemProcessor implements ItemProcessor<VanTransaction, String> {
+
+    @Override
+    public String process(VanTransaction tx) {
+        // 카드번호 마스킹: 앞 6자리 + ****** + 뒤 4자리
+        // 개인정보 보호를 위해 중간 6자리를 마스킹
+        // 예) 1234567890120003 → 123456******0003
+        String cardNumber = tx.getCardNumber().replaceAll("-", "");
+        String maskedCard;
+        if (cardNumber.length() >= 10) {
+            maskedCard = cardNumber.substring(0, 6)
+                    + "******"
+                    + cardNumber.substring(cardNumber.length() - 4);
+        } else {
+            maskedCard = "******";
+        }
+
+        // CSV 한 줄 생성: RRN,STAN,CARD_NUMBER,AMOUNT,MERCHANT_ID,CARD_COMPANY,APPROVAL_CODE,CREATED_AT
+        return String.join(",",
+                tx.getRrn(),
+                tx.getStan(),
+                maskedCard,
+                String.valueOf(tx.getAmount()),
+                tx.getMerchantId(),
+                tx.getCardCompany() != null ? tx.getCardCompany() : "UNKNOWN",
+                tx.getApprovalCode() != null ? tx.getApprovalCode() : "",
+                tx.getCreatedAt().toString()
+        );
+    }
+}`
+          },
+          {
+            title: "SSE 정산 결과 수신 — SseController.java",
+            code: `@Slf4j
+@RestController
+@RequestMapping("/api/van/sse")
+public class SseController {
+
+    // batchDate별로 SSE 연결 관리 (다중 날짜 구독 대응)
+    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+
+    public record BatchResultRequest(
+            String batchDate,
+            String statusCode, // SUCCESS / COMPARE_FAILED / SETTLEMENT_FAILED
+            String message
+    ) {}
+
+    // VAN 관리자가 정산 결과를 기다릴 때 구독
+    // Polling 방식 대비 불필요한 요청 없이 서버에서 Push
+    @GetMapping(value = "/subscribe/{batchDate}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribe(@PathVariable String batchDate) {
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30분 타임아웃
+        emitters.put(batchDate, emitter);
+        emitter.onCompletion(() -> emitters.remove(batchDate));
+        emitter.onTimeout(() -> emitters.remove(batchDate));
+        log.info("[SSE] 구독 시작 - 날짜: {}", batchDate);
+        return emitter;
+    }
+
+    // 카드사가 대조 완료 후 결과를 VAN으로 통보하는 엔드포인트
+    @PostMapping("/batch-result")
+    public void receiveBatchResult(@RequestBody BatchResultRequest resultRequest) {
+        log.info("[SSE] 배치 결과 수신 - 날짜: {}, 상태: {}", 
+                resultRequest.batchDate(), resultRequest.statusCode());
+
+        SseEmitter emitter = emitters.get(resultRequest.batchDate());
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("batch-result")
+                        .data(resultRequest));
+
+                // 최종 상태(SUCCESS, FAILED 시리즈)이면 연결 종료
+                if (!"PROCESSING".equals(resultRequest.statusCode())) {
+                    emitter.complete();
+                    emitters.remove(resultRequest.batchDate());
+                }
+            } catch (IOException e) {
+                log.error("[SSE] 전송 중 오류: {}", e.getMessage());
+                emitters.remove(resultRequest.batchDate());
+            }
+        } else {
+            log.warn("[SSE] 활성 구독 없음 - 날짜: {}", resultRequest.batchDate());
+        }
+    }
+}`
+          }
+        ]
+      }
+    },
+    {
+      id: "rag",
+      title: "포트폴리오 RAG 챗봇",
+      role: "백엔드 개발 / 인프라 배포",
+      desc: "Spring AI + Qdrant 벡터DB로 구현한 RAG 파이프라인을 Ubuntu Server에 직접 배포한 포트폴리오 AI 어시스턴트",
+      img: "icons/rag2.png",
+      stack: ["Java", "Spring Boot", "Spring AI", "OpenAI API", "Qdrant", "Docker", "Nginx", "Ubuntu"],
+      links: { github: "https://github.com/jsssun/portfolio-rag" },
+      detail: {
+        overview: "방문자가 포트폴리오 사이트에서 직접 질문할 수 있는 AI 어시스턴트입니다. profile.txt를 512토큰 단위로 청킹하여 Qdrant 벡터DB에 임베딩 저장하고, 질문이 들어오면 유사도 검색으로 관련 청크를 조회한 뒤 OpenAI GPT에 컨텍스트로 주입해 답변을 생성하는 RAG(Retrieval-Augmented Generation) 구조입니다.",
+        problem: "LLM에게 단순히 질문만 던지면 학습 데이터 기반으로 부정확한 답변을 생성합니다. 포트폴리오 특성상 실제 본인 정보(프로젝트, 자격증, 수상 내역 등)만 정확하게 답해야 했고, VirtualBox Ubuntu Server 환경에서 외부 접근이 가능한 배포 구성도 처음부터 직접 설계해야 했습니다.",
+        solution: "검색 결과를 시스템 프롬프트에 주입하는 RAG 구조로 LLM의 hallucination을 차단했습니다. Qdrant는 gRPC 포트(6334)를 통해 연결하고, Nginx 리버스 프록시로 HTTPS를 처리했습니다. 앱 시작 시 profile.txt를 자동 임베딩하는 ProfileDataLoader로 초기 데이터 적재를 자동화했습니다.",
+        contributions: [
+          "RAG 파이프라인 전체 설계 및 구현 — 청킹(TokenTextSplitter, 512토큰) → 임베딩 → 벡터 저장 → 유사도 검색 → LLM 호출",
+          "QdrantDocumentStore: gRPC 기반 Qdrant 클라이언트 직접 구성, 컬렉션 자동 생성(initializeSchema) 및 유사도 검색 구현",
+          "RagService: 검색된 청크를 [1]/[2] 형식 컨텍스트로 조합 후 시스템 프롬프트에 주입, 정보 범위 제한으로 hallucination 방지",
+          "ProfileDataLoader(ApplicationRunner): 앱 시작 시 profile.txt 자동 임베딩, 중복 저장 방지 로직 포함",
+          "Ubuntu Server에 Docker + Nginx 기반 배포, CORS 설정으로 GitHub Pages에서 직접 호출 가능하도록 구성",
+          "포트폴리오 프론트엔드에서 /api/rag/health 헬스체크로 서버 상태 확인 후 채팅 UI 조건부 표시"
+        ],
+        codeSnippets: [
+          {
+            title: "RAG 답변 생성 흐름 — RagService.java",
+            code: `public QueryResponseDto generateAnswer(String question, int maxResults) {
+    // 1단계: Qdrant에서 관련 청크 유사도 검색
+    List relevantDocs =
+        vectorStore.similaritySearch(question, Math.max(maxResults, 5));
+
+    if (relevantDocs.isEmpty())
+        return new QueryResponseDto(question, "관련 정보를 찾을 수 없습니다.", List.of());
+
+    // 2단계: 청크 → [1] 내용 형태로 컨텍스트 조합
+    String context = IntStream.range(0, relevantDocs.size())
+        .mapToObj(i -> "[" + (i+1) + "] " + relevantDocs.get(i).getContent())
+        .collect(Collectors.joining("\\n\\n"));
+
+    // 3단계: 시스템 프롬프트에 컨텍스트 주입 (RAG 핵심)
+    // → 이 제약 없으면 LLM이 학습 데이터 기반으로 hallucination 발생
+    String systemPrompt = """
+        당신은 정선우의 포트폴리오 AI 어시스턴트입니다.
+        주어진 정보에 없는 내용은 "해당 정보는 없습니다"라고 답하세요.
+        정보: """ + context;
+
+    // 4단계: LLM 호출 → 최종 답변 반환
+    var response = chatService.chat(question, systemPrompt);
+    String answer = response.getResult().getOutput().getText();
+    return new QueryResponseDto(question, answer, sources);
+}`
+          },
+          {
+            title: "벡터DB 청킹 저장 — QdrantDocumentStore.java",
+            code: `public void addDocument(String id, String text, Map metadata) {
+    Document document = new Document(text, metadata);
+
+    // 긴 텍스트를 512토큰 단위로 분할
+    // 통째로 임베딩하면 토큰 한도 초과 + 검색 정밀도 저하
+    TokenTextSplitter splitter = TokenTextSplitter.builder()
+        .withChunkSize(512)
+        .withMinChunkSizeChars(100)
+        .withKeepSeparator(true)
+        .build();
+
+    List chunks = splitter.split(document);
+
+    // 각 청크를 임베딩 후 Qdrant에 저장
+    vectorStore.add(chunks);
+}`
+          }
         ]
       }
     },
@@ -89,49 +361,6 @@ const portfolioData = {
         ]
       }
     },
-    {
-      id: "taw",
-      title: "Travel Around The World",
-      role: "클라이언트 게임 개발",
-      desc: "세계를 여행하는 열차에서 카페를 운영하는 스토리 시뮬레이션 게임",
-      img: "icons/taw.png",
-      stack: ["Unity", "C#"],
-      links: { github: "https://github.com/TUMS-Cafe/TravelAroundTheWorld" },
-      detail: {
-        overview: "세계를 여행하는 열차 '루나 익스프레스'를 배경으로, 낮에는 카페를 운영하고 밤에는 열차를 탐험하며 승객들의 이야기를 풀어가는 스토리 중심 어드벤처 게임입니다. UNICON 2024 전국 게임 전시회에서 50개 팀 중 우수상을 수상했습니다.",
-        problem: "스토리 진행과 시뮬레이션 플레이를 자연스럽게 결합하고, 반복적인 일과 속에서도 선택이 의미 있게 작용하도록 만드는 것이 어려웠습니다.",
-        solution: "낮/밤 진행 시스템과 카페 운영을 스토리 이벤트와 연결하고, 선택과 행동에 따라 분기되는 대사 및 엔딩 구조를 구현했습니다.",
-        contributions: [
-          "챕터 1 전체 게임 흐름(스토리, 카페 운영, 탐험, 엔딩 분기) 구현",
-          "CSV 기반 대사 및 이벤트 관리 시스템 개발 — 기획 변경에 유연하게 대응",
-          "카페 메인 루프 및 룸서비스 비동기 이벤트 구현",
-          "NPC 상호작용, 퀘스트 UI, 해피/배드 엔딩 로직 구현"
-        ]
-      }
-    },
-    {
-      id: "recipe",
-      title: "단 하나의 레시피",
-      role: "클라이언트 게임 개발",
-      desc: "할머니의 제과점을 운영하는 힐링 2D 베이킹 타이쿤 게임 — Google Play 출시",
-      img: "icons/recipe2.png",
-      stack: ["Unity", "C#"],
-      links: {
-        github: "https://github.com/SUHHAN/HexaSnow",
-        playstore: "https://play.google.com/store/apps/details?id=com.DefaultCompany.HexaSnow&pli=1"
-      },
-      detail: {
-        overview: "할머니로부터 물려받은 제과점을 10일간 운영하며 베이킹과 손님 응대를 통해 따뜻한 이야기를 경험하는 힐링 스토리 중심의 2D 베이킹 게임입니다. 동아리 발표회 대상 수상 후 리팩토링을 거쳐 Google Play Store에 출시했습니다.",
-        problem: "반복적인 플레이로 인한 피로감을 줄이면서도, 베이킹 과정 자체는 재미있고 의미 있게 만드는 것이 과제였습니다.",
-        solution: "반죽·오븐·재료 상점 등 다양한 베이킹 미니게임과 레시피·재료·토핑 시스템을 도입하고, 손님별 시나리오와 결과 분기를 추가해 플레이에 변화를 주었습니다.",
-        contributions: [
-          "Unity와 C#을 활용한 클라이언트 전반 개발 담당",
-          "베이킹 전체 플레이 흐름(재료 선택 → 반죽 → 오븐 → 토핑) 설계 및 구현",
-          "레시피 해금 조건 및 레시피북 연동 시스템 구현",
-          "손님별 시나리오 및 결과 분기 로직 구현"
-        ]
-      }
-    }
   ],
 
   activities: [
@@ -151,33 +380,33 @@ const portfolioData = {
 // --- Badge Map & Tech Stack Renderer ---
 
 const BADGE_MAP = {
-  "Java":          "https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white",
-  "Python":        "https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white",
-  "JavaScript":    "https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black",
-  "TypeScript":    "https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white",
-  "C#":            "https://img.shields.io/badge/C%23-239120?style=flat&logo=csharp&logoColor=white",
-  "MySQL":         "https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white",
-  "Nginx":         "https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white",
+  "Java": "https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white",
+  "Python": "https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white",
+  "JavaScript": "https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black",
+  "TypeScript": "https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white",
+  "C#": "https://img.shields.io/badge/C%23-239120?style=flat&logo=csharp&logoColor=white",
+  "MySQL": "https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white",
+  "Nginx": "https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white",
   "Apache Tomcat": "https://img.shields.io/badge/Tomcat-F8DC75?style=flat&logo=apachetomcat&logoColor=black",
-  "Docker":        "https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white",
-  "AWS":           "https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazonwebservices&logoColor=white",
-  "WSL":           "https://img.shields.io/badge/WSL-0078D4?style=flat&logo=windows&logoColor=white",
-  "Spring Boot":   "https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white",
-  "Spring Batch":  "https://img.shields.io/badge/Spring_Batch-6DB33F?style=flat&logo=spring&logoColor=white",
-  "Servlet/JSP":   "https://img.shields.io/badge/Servlet%2FJSP-007396?style=flat&logo=openjdk&logoColor=white",
-  "JDBC":          "https://img.shields.io/badge/JDBC-007396?style=flat&logo=openjdk&logoColor=white",
-  "HikariCP":      "https://img.shields.io/badge/HikariCP-0096FF?style=flat&logoColor=white",
-  "Lombok":        "https://img.shields.io/badge/Lombok-CC0000?style=flat&logoColor=white",
-  "Logback":       "https://img.shields.io/badge/Logback-6DB33F?style=flat&logoColor=white",
-  "JUnit":         "https://img.shields.io/badge/JUnit5-25A162?style=flat&logo=junit5&logoColor=white",
-  "React":         "https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black",
-  "Next.js":       "https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white",
-  "Tailwind CSS":  "https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white",
-  "HTML":          "https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white",
-  "Git":           "https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white",
-  "Postman":       "https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white",
-  "Notion":        "https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white",
-  "Eureka":        "https://img.shields.io/badge/Eureka-6DB33F?style=flat&logo=spring&logoColor=white",
+  "Docker": "https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white",
+  "AWS": "https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazonwebservices&logoColor=white",
+  "WSL": "https://img.shields.io/badge/WSL-0078D4?style=flat&logo=windows&logoColor=white",
+  "Spring Boot": "https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white",
+  "Spring Batch": "https://img.shields.io/badge/Spring_Batch-6DB33F?style=flat&logo=spring&logoColor=white",
+  "Servlet/JSP": "https://img.shields.io/badge/Servlet%2FJSP-007396?style=flat&logo=openjdk&logoColor=white",
+  "JDBC": "https://img.shields.io/badge/JDBC-007396?style=flat&logo=openjdk&logoColor=white",
+  "HikariCP": "https://img.shields.io/badge/HikariCP-0096FF?style=flat&logoColor=white",
+  "Lombok": "https://img.shields.io/badge/Lombok-CC0000?style=flat&logoColor=white",
+  "Logback": "https://img.shields.io/badge/Logback-6DB33F?style=flat&logoColor=white",
+  "JUnit": "https://img.shields.io/badge/JUnit5-25A162?style=flat&logo=junit5&logoColor=white",
+  "React": "https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black",
+  "Next.js": "https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white",
+  "Tailwind CSS": "https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white",
+  "HTML": "https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white",
+  "Git": "https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white",
+  "Postman": "https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white",
+  "Notion": "https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white",
+  "Eureka": "https://img.shields.io/badge/Eureka-6DB33F?style=flat&logo=spring&logoColor=white",
   "Spring Data JPA": "https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat&logo=spring&logoColor=white"
 };
 
@@ -187,11 +416,11 @@ function renderTechStack(techStack) {
       <span class="techstack-category">${category}</span>
       <div class="techstack-badges">
         ${items.map(item => {
-          const url = BADGE_MAP[item];
-          return url
-            ? `<img src="${url}" alt="${item}" class="techstack-badge-img" />`
-            : `<span class="techstack-badge">${item}</span>`;
-        }).join("")}
+    const url = BADGE_MAP[item];
+    return url
+      ? `<img src="${url}" alt="${item}" class="techstack-badge-img" />`
+      : `<span class="techstack-badge">${item}</span>`;
+  }).join("")}
       </div>
     </div>
   `).join("");
@@ -379,6 +608,27 @@ document.addEventListener("DOMContentLoaded", () => {
             <ul>
               ${p.detail.contributions.map((item) => `<li>${item}</li>`).join("")}
             </ul>
+
+            ${p.detail.codeSnippets ? `
+            <h3>핵심 코드</h3>
+            ${p.detail.codeSnippets.map(snippet => `
+              <div style="margin-bottom:24px;">
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:8px; font-weight:600;">${snippet.title}</p>
+                <pre style="
+                  background: var(--code-bg, #f6f8fa);
+                  border: 1px solid var(--border);
+                  border-radius: 10px;
+                  padding: 18px;
+                  overflow-x: auto;
+                  font-size: 0.78rem;
+                  line-height: 1.7;
+                  color: var(--code-color, #24292e);
+                  font-family: 'Courier New', monospace;
+                  white-space: pre;
+                ">${snippet.code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+              </div>
+            `).join('')}
+            ` : ''}
           </div>
         </div>
 
@@ -394,8 +644,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="sidebar-label">Links</span>
             <a href="${p.links.github}" target="_blank" class="btn-pill" style="display:block; text-align:center; width:100%;">GitHub Repository</a>
             ${p.links.playstore
-              ? `<a href="${p.links.playstore}" target="_blank" class="btn-pill" style="display:block; text-align:center; width:100%; margin-top:10px;">Play Store</a>`
-              : ""}
+        ? `<a href="${p.links.playstore}" target="_blank" class="btn-pill" style="display:block; text-align:center; width:100%; margin-top:10px;">Play Store</a>`
+        : ""}
           </div>
         </aside>
       </div>
